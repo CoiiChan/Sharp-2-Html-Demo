@@ -1,3 +1,8 @@
+## 在线演示
+
+- [SingleFrame](https://coiichan.github.io/Sharp-2-Html-Demo/)
+- [Titanic Demo](https://coiichan.github.io/Sharp-2-Html-Demo/titanic/) 注意流量消耗
+
 # Sharp-2-Html-Demo
 
 本项目是 [ComfyUI-Sharp-Render-Splat](https://github.com/CoiiChan/ComfyUI-Sharp-Render-Splat) 的Demo示例。
@@ -14,9 +19,6 @@ ComfyUI自定义节点插件，用于将Apple ml sharp PLY Gaussian Splat文件�
 - 🎯 **动态摇摆角度**：可控制相机环绕时的摇摆角度范围
 - 🚀 **高质量渲染**：基于WebGL的硬件加速渲染
 
-## 在线演示
 
-- [SingleFrame](https://coiichan.github.io/Sharp-2-Html-Demo/)
-- [Titanic Demo](https://coiichan.github.io/Sharp-2-Html-Demo/titanic/)
 
 
