@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TitanicSplat Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #viewer-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        #viewer-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #sequence-controls {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+            z-index: 2147483647;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+        }
+        #frame-display {
+            font-size: 12px;
+            color: #ffffff;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+        }
+        button {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        button:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        #audioControlBtn {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.4);
+        }
+        #audioControlBtn:hover {
+            background: rgba(255, 165, 0, 0.3);
+        }
+        #audioControlBtn.muted {
+            background: rgba(255, 99, 71, 0.2);
+            border: 1px solid rgba(255, 99, 71, 0.4);
+        }
+        #audioControlBtn.muted:hover {
+            background: rgba(255, 99, 71, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- 音频元素 -->
+    <audio id="bgMusic" loop muted>
+      <source src="https://music-proxy.gdstudio.org/https://upos-hz-mirrorakam.akamaized.net/upgcxcode/12/72/1025687212/1025687212_nb3-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&gen=playurlv3&os=akam&og=hw&oi=2453170430&platform=pc&deadline=1770094862&uipk=5&nbs=1&trid=a20c5e05abe4433bbe2c4d22e8f9585u&mid=0&upsig=a845bc139d45fcbbc5a1ca653960d56e&uparams=e,gen,os,og,oi,platform,deadline,uipk,nbs,trid,mid&hdnts=exp=1770094862~hmac=4f8bfb8f3026f11f7ff2e91a3bcbf1e9f4835ee77358cda7cb0f4c3ef37023b7&bvc=vod&nettype=0&bw=224834&qn_dyeid=3b65979cda34e9da00f6986b698164ee&agrr=0&buvid=963989FD-B3A1-A5A1-358E-A85CD0E683C307876infoc&build=0&dl=0&f=u_0_0&orderid=0,2" type="audio/mpeg">
+      你的浏览器不支持音频播放，请更换现代浏览器（如Chrome、Edge）
+   </audio>
+    
+    <div id="viewer-container">
+        <iframe id="viewer-iframe" src="index_viewer.html?frame=0"></iframe>
+    </div>
+    <div id="sequence-controls">
+        <button id="prev-button">◀</button>
+        <div id="frame-display">1 / 3</div>
+        <button id="next-button">▶</button>
+        <button id="audioControlBtn">♫</button>
+    </div>
+
+    <script>
+        // 4D Gaussian Splat Sequence Navigation
+        (function() {
+            // Global variables
+            const totalFrames = 95;
+            const iframe = document.getElementById('viewer-iframe');
+            const frameDisplay = document.getElementById('frame-display');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            
+            // Get current frame from URL parameter or default to 0
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentFrame = urlParams.get('frame') ? parseInt(urlParams.get('frame')) : 0;
+            // Ensure frame index is valid
+            currentFrame = Math.max(0, Math.min(currentFrame, totalFrames - 1));
+            
+            console.log('=== 4D Gaussian Splat Sequence Initialized ===');
+            console.log('Total frames:', totalFrames);
+            
+            // Update frame display
+            function updateFrameDisplay() {
+                frameDisplay.textContent = (currentFrame + 1) + ' / ' + totalFrames;
+            }
+            
+            // Update iframe src to load new frame
+            function updateIframeSrc() {
+                const iframeSrc = 'index_viewer.html?frame=' + currentFrame;
+                iframe.src = iframeSrc;
+                console.log('=== Loading frame ' + currentFrame + ' in iframe ===');
+                
+                // Update URL without page refresh
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('frame', currentFrame.toString());
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
+                window.history.pushState({path: newUrl}, '', newUrl);
+            }
+            
+            // Go to next frame
+            function nextFrame() {
+                console.log('=== Next frame clicked ===');
+                currentFrame = (currentFrame + 1) % totalFrames;
+                updateFrameDisplay();
+                updateIframeSrc();
+            }
+            
+            // Go to previous frame
+            function prevFrame() {
+                console.log('=== Previous frame clicked ===');
+                currentFrame = (currentFrame - 1 + totalFrames) % totalFrames;
+                updateFrameDisplay();
+                updateIframeSrc();
+            }
+            
+            // Add event listeners
+            prevButton.addEventListener('click', prevFrame);
+            nextButton.addEventListener('click', nextFrame);
+            
+            // Initial update
+            updateFrameDisplay();
+            
+            console.log('=== Sequence navigation initialized ===');
+        })();
+        
+        // Audio control functionality
+        (function() {
+            // 获取音频元素和按钮元素
+            const audio = document.getElementById('bgMusic');
+            const controlBtn = document.getElementById('audioControlBtn');
+
+            // 按钮点击事件：切换播放/静音状态
+            controlBtn.addEventListener('click', () => {
+                if (audio.muted) {
+                    // 取消静音
+                    audio.muted = false;
+                    controlBtn.textContent = '♫';
+                    controlBtn.classList.remove('muted');
+                    // 立即播放
+                    if (audio.paused) {
+                        audio.play().catch(err => {
+                            console.log('播放失败:', err);
+                        });
+                    }
+                } else {
+                    // 静音
+                    audio.muted = true;
+                    controlBtn.textContent = '♫';
+                    controlBtn.classList.add('muted');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+        
